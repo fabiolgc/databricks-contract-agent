@@ -8,7 +8,7 @@ include:
 variables:
   catalog:
     description: "Catalog do Unity Catalog"
-    default: cielo_demo
+    default: fabio_goncalves
   schema:
     description: "Schema do Unity Catalog"
     default: contract_agent
@@ -17,7 +17,7 @@ variables:
     default: contracts_ptbr
   cluster_id:
     description: "Cluster ID (all-purpose) para rodar o job. Você pode setar via --var cluster_id=..."
-    default: ""
+    default: "0709-132523-cnhxf2p6"
 
 targets:
   dev:

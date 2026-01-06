@@ -1,42 +1,68 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 01 - Copiar PDFs do repositório para o Volume (PT-BR)
+# MAGIC # 01 - Copy workspace pdf files to volume
 # MAGIC
-# MAGIC - Origem: `assets/pdfs/pt-br/`
-# MAGIC - Destino: `dbfs:/Volumes/<catalog>/<schema>/<volume>/`
+# MAGIC - Source: `assets/pdfs/pt-br/`
+# MAGIC - Destination: `dbfs:/Volumes/<catalog>/<schema>/<volume>/`
 # MAGIC
-# MAGIC > Se você preferir, pode ignorar este notebook e apenas fazer upload via UI do Volume.
+# MAGIC > If you prefer, you can skip this notebook and just upload via the Volume UI.
+# MAGIC
+
+# COMMAND ----------
+
+# MAGIC %pip install pyyaml
+# MAGIC %restart_python
 
 # COMMAND ----------
 
 import os
-from src.lib.config import load_config, volume_dbfs_path
+from src.lib.config import load_config, volume_dbfs_path, volume_local_path
 
 # COMMAND ----------
 
-REPO_ROOT = os.getcwd()
+NOTEBOOK_DIR = os.getcwd()
+NOTRBOOK_PARENT = os.path.dirname(NOTEBOOK_DIR)
+REPO_ROOT = os.path.dirname(NOTRBOOK_PARENT)
 CONFIG_PATH = os.path.join(REPO_ROOT, "conf", "demo_config.yml")
 cfg = load_config(CONFIG_PATH)
 
 src_dir = os.path.join(REPO_ROOT, "assets", "pdfs", "pt-br")
-dst_dir = volume_dbfs_path(cfg)
+dst_dir = volume_local_path(cfg)
 
-print("Origem:", src_dir)
-print("Destino:", dst_dir)
+print("Source:", src_dir)
+print("Ending:", dst_dir)
 
 # COMMAND ----------
 
-# Garante que o destino existe
-dbutils.fs.mkdirs(dst_dir)
+# Cria catálogo e schema conforme nomes em cfg
+catalog_name = cfg.catalog
+schema_name = cfg.schema
+volume_name = cfg.volume
 
-# Copia PDFs
-files = [f for f in os.listdir(src_dir) if f.lower().endswith(".pdf")]
-print("Arquivos:", len(files))
+spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog_name}")
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.{schema_name}")
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {catalog_name}.{schema_name}.{volume_name}")
 
-for f in files:
-    src = f"file:{os.path.join(src_dir, f)}"
-    dst = f"{dst_dir}/{f}"
-    dbutils.fs.cp(src, dst, recurse=False)
+# COMMAND ----------
 
-print("OK. Exemplos no volume:")
-display(dbutils.fs.ls(dst_dir)[:5])
+import os
+
+# List PDF files in the source directory
+files = [
+    f
+    for f in os.listdir(src_dir)
+    if f.lower().endswith(".pdf")
+]
+
+file_names = [f for f in files]
+
+for idx, fname in enumerate(files, 1):
+    src_path = os.path.join(src_dir, fname)
+    dst_path = os.path.join(dst_dir, fname)
+     
+    print(f"{src_path} - {dst_path}")
+
+    with open(src_path, "rb") as fsrc:
+        with open(dst_path, "wb") as fdst:
+            fdst.write(fsrc.read())
+    print(f"{idx}: {src_path} -> {dst_path}")

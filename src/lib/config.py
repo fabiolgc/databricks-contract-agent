@@ -32,4 +32,4 @@ def volume_dbfs_path(cfg: DemoConfig) -> str:
 
 def volume_local_path(cfg: DemoConfig) -> str:
     # /dbfs is mounted local view of dbfs:
-    return f"/dbfs/Volumes/{cfg.catalog}/{cfg.schema}/{cfg.volume}"
+    return f"/Volumes/{cfg.catalog}/{cfg.schema}/{cfg.volume}"

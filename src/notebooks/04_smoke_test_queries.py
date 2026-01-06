@@ -1,12 +1,13 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 04 - Smoke test (perguntas de demo)
+# MAGIC # 04 - Smoke test (demo questions)
 # MAGIC
-# MAGIC Faz algumas consultas no Vector Search e imprime os trechos com (doc, página).
+# MAGIC Runs some queries on Vector Search and prints the excerpts with (doc, page).
 
 # COMMAND ----------
 
 # MAGIC %pip install -q databricks-vectorsearch pyyaml
+# MAGIC %restart_python
 
 # COMMAND ----------
 
@@ -14,14 +15,20 @@ from databricks.vector_search.client import VectorSearchClient
 from src.lib.config import load_config
 import os
 
+vsc = VectorSearchClient(disable_notice=True) # Ensure the notice is disabled
+
 # COMMAND ----------
 
-REPO_ROOT = os.getcwd()
+NOTEBOOK_DIR = os.getcwd()
+NOTRBOOK_PARENT = os.path.dirname(NOTEBOOK_DIR)
+REPO_ROOT = os.path.dirname(NOTRBOOK_PARENT)
 CONFIG_PATH = os.path.join(REPO_ROOT, "conf", "demo_config.yml")
 cfg = load_config(CONFIG_PATH)
 
-vsc = VectorSearchClient()
 idx = vsc.get_index(endpoint_name=cfg.vector_search_endpoint, index_name=cfg.vector_search_index)
+
+
+# COMMAND ----------
 
 queries = [
   "Onde fala sobre multa por rescisão antecipada?",
@@ -33,10 +40,13 @@ queries = [
 
 # COMMAND ----------
 
+arr = ""
+r = ""
+
 for q in queries:
     print("\n" + "="*100)
     print("Q:", q)
-    r = idx.similarity_search(query_text=q, columns=["content", "doc_name", "page"], num_results=4)
+    r = idx.similarity_search(query_text=q, columns=["content", "doc_name", "page"], num_results=4,disable_notice=True)
     # r é dict; resultados em r['result']['data_array']
     arr = r["result"]["data_array"]
     for i, row in enumerate(arr, start=1):

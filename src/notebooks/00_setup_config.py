@@ -6,14 +6,33 @@
 
 # COMMAND ----------
 
+# MAGIC %pip install pyyaml
+# MAGIC %restart_python
+
+# COMMAND ----------
+
 import os
 from src.lib.config import load_config, volume_dbfs_path, volume_local_path
 
 # COMMAND ----------
 
-# Ajuste se você rodar fora do repo /Workspace/Repos
-REPO_ROOT = os.getcwd()
-CONFIG_PATH = os.path.join(REPO_ROOT, "conf", "demo_config.yml")
+
+NOTEBOOK_DIR = os.getcwd()
+NOTRBOOK_PARENT = os.path.dirname(NOTEBOOK_DIR)
+REPO_ROOT = os.path.dirname(NOTRBOOK_PARENT)
+
+print(REPO_ROOT)
+CONFIG_PATH = os.path.join(
+    REPO_ROOT,
+    "conf",
+    "demo_config.yml"
+)
+
+if not os.path.exists(CONFIG_PATH):
+    raise FileNotFoundError(
+        f"Config file not found at {CONFIG_PATH}. "
+        "Please check the path or upload the file."
+    )
 
 cfg = load_config(CONFIG_PATH)
 
@@ -21,11 +40,6 @@ print("Config carregada:")
 print(cfg)
 print("\nVolume (dbfs):", volume_dbfs_path(cfg))
 print("Volume (local):", volume_local_path(cfg))
-print("\nTabela fonte (chunks):", cfg.source_table)
+print("\nTabela source (chunks):", cfg.source_table)
 print("Vector Search endpoint:", cfg.vector_search_endpoint)
 print("Vector Search index:", cfg.vector_search_index)
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC **Próximo passo:** rode o notebook 01 para copiar PDFs do repo para o Volume (ou faça upload manual via UI).

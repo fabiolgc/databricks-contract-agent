@@ -1,5 +1,5 @@
 # Configuração da demo (AWS)
-catalog: cielo_demo
+catalog: fabio_goncalves
 schema: contract_agent
 volume: contracts_ptbr
 

@@ -1,13 +1,14 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 02 - Extrair texto dos PDFs e gerar chunks (Delta)
+# MAGIC # 02 - Extract text from PDFs and generate chunks (Delta)
 # MAGIC
-# MAGIC Saída: tabela Delta `contracts_chunks` com colunas:
+# MAGIC Output: Delta table `contracts_chunks` with columns:
 # MAGIC - `doc_id`, `source_path`, `doc_name`, `page`, `chunk_id`, `content`, `lang`
 
 # COMMAND ----------
 
 # MAGIC %pip install -q pypdf pyyaml
+# MAGIC %restart_python
 
 # COMMAND ----------
 
@@ -17,16 +18,22 @@ from src.lib.config import load_config, volume_local_path, volume_dbfs_path
 
 # COMMAND ----------
 
-REPO_ROOT = os.getcwd()
+NOTEBOOK_DIR = os.getcwd()
+NOTRBOOK_PARENT = os.path.dirname(NOTEBOOK_DIR)
+REPO_ROOT = os.path.dirname(NOTRBOOK_PARENT)
 CONFIG_PATH = os.path.join(REPO_ROOT, "conf", "demo_config.yml")
 cfg = load_config(CONFIG_PATH)
 
 vol_local = volume_local_path(cfg)
 vol_dbfs = volume_dbfs_path(cfg)
 
-print("Lendo PDFs do volume:", vol_local)
+pdf_files = [f for f in os.listdir(vol_local) if f.lower().endswith(".pdf")]
+print("Read PDF files from volume:", vol_local)
+print("PDF files found:", len(pdf_files))
 
 # COMMAND ----------
+
+#extract chuncks from pdf files
 
 def chunk_text(text: str, max_chars: int = 900, overlap: int = 120):
     text = re.sub(r"\s+", " ", (text or "")).strip()
@@ -67,14 +74,25 @@ display(df.limit(5))
 
 # COMMAND ----------
 
-# Cria catálogo/schema, se necessário
+# create catalog/schema if needed
 spark.sql(f"CREATE CATALOG IF NOT EXISTS {cfg.catalog}")
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {cfg.catalog}.{cfg.schema}")
 
-# Salva a tabela Delta
+# save delta table with change data feed enabled
 (df.write
   .mode("overwrite")
   .option("overwriteSchema", "true")
+  .option("delta.enableChangeDataFeed", "true")
   .saveAsTable(f"{cfg.catalog}.{cfg.schema}.contracts_chunks"))
 
-print("Tabela criada:", f"{cfg.catalog}.{cfg.schema}.contracts_chunks", "rows:", df.count())
+print("Created table:", f"{cfg.catalog}.{cfg.schema}.contracts_chunks", "rows:", df.count())
+
+# COMMAND ----------
+
+#spark.sql(f"ALTER TABLE {cfg.catalog}.{cfg.schema}.contracts_chunks SET TBLPROPERTIES (delta.enableChangeDataFeed = true)")
+
+# COMMAND ----------
+
+# display data for validation
+df = spark.read.table(f"{cfg.catalog}.{cfg.schema}.contracts_chunks")
+display(df.limit(50))
