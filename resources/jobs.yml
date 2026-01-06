@@ -37,7 +37,8 @@ resources:
             notebook_path: ${workspace.file_path}/src/notebooks/04_smoke_test_queries.py
       environments:
         - environment_key: default
-          spec:            
+          spec:   
+            client : "1"         
             dependencies:
               - pypdf 
               - pyyaml
