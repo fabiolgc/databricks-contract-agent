@@ -7,8 +7,8 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install -q pypdf pyyaml
-# MAGIC %restart_python
+#%pip install -q pypdf pyyaml
+#%restart_python
 
 # COMMAND ----------
 
