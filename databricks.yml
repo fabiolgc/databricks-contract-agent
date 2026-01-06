@@ -1,0 +1,24 @@
+bundle:
+  name: cielo-contract-agent-demo
+
+include:
+  - resources/*.yml
+
+# Variáveis do bundle (override via --var)
+variables:
+  catalog:
+    description: "Catalog do Unity Catalog"
+    default: cielo_demo
+  schema:
+    description: "Schema do Unity Catalog"
+    default: contract_agent
+  volume:
+    description: "Nome do volume onde os PDFs ficarão"
+    default: contracts_ptbr
+  cluster_id:
+    description: "Cluster ID (all-purpose) para rodar o job. Você pode setar via --var cluster_id=..."
+    default: ""
+
+targets:
+  dev:
+    default: true

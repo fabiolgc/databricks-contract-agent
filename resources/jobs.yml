@@ -1,0 +1,37 @@
+resources:
+  jobs:
+    cielo_contract_agent_demo_job:
+      name: "[demo] Cielo Contract Agent - Build Vector Index"
+      tasks:
+        - task_key: setup_config
+          existing_cluster_id: ${var.cluster_id}
+          notebook_task:
+            notebook_path: ${workspace.file_path}/src/notebooks/00_setup_config.py
+
+        - task_key: stage_pdfs
+          depends_on:
+            - task_key: setup_config
+          existing_cluster_id: ${var.cluster_id}
+          notebook_task:
+            notebook_path: ${workspace.file_path}/src/notebooks/01_stage_pdfs_to_volume.py
+
+        - task_key: extract_chunks
+          depends_on:
+            - task_key: stage_pdfs
+          existing_cluster_id: ${var.cluster_id}
+          notebook_task:
+            notebook_path: ${workspace.file_path}/src/notebooks/02_extract_chunk_to_delta.py
+
+        - task_key: create_vs_index
+          depends_on:
+            - task_key: extract_chunks
+          existing_cluster_id: ${var.cluster_id}
+          notebook_task:
+            notebook_path: ${workspace.file_path}/src/notebooks/03_create_vector_search_index.py
+
+        - task_key: smoke_test
+          depends_on:
+            - task_key: create_vs_index
+          existing_cluster_id: ${var.cluster_id}
+          notebook_task:
+            notebook_path: ${workspace.file_path}/src/notebooks/04_smoke_test_queries.py
