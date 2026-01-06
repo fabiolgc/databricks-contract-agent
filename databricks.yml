@@ -1,6 +1,9 @@
 bundle:
   name: cielo-contract-agent-demo
 
+workspace:
+  host: https://e2-demo-field-eng.cloud.databricks.com/
+
 include:
   - resources/*.yml
 
@@ -22,3 +25,4 @@ variables:
 targets:
   dev:
     default: true
+    mode: development
