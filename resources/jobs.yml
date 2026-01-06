@@ -1,23 +1,5 @@
 resources:
   jobs:
-    serverless_job_environment:
-      name: serverless_job_environment
-      tasks:
-        - task_key: task
-          spark_python_task:
-            python_file: ../src/main.py
-          # Reference the environment defined below
-          environment_key: default
-      # List one or more environments for this job
-      environments:
-        - environment_key: default
-          spec:
-            environment_version: '2'
-            dependencies:
-              - my-library
-
-resources:
-  jobs:
     cielo_contract_agent_demo_job:
       name: "[demo] Cielo Contract Agent - Build Vector Index"
       tasks:
