@@ -7,8 +7,8 @@
 
 # COMMAND ----------
 
-#%pip install -q pypdf pyyaml
-#%restart_python
+# MAGIC %pip install -q pypdf pyyaml
+# MAGIC %restart_python
 
 # COMMAND ----------
 
@@ -71,6 +71,18 @@ for f in os.listdir(vol_local):
 
 df = spark.createDataFrame(rows)
 display(df.limit(5))
+
+# COMMAND ----------
+
+query = f"""
+SELECT *
+FROM {cfg.catalog}.{cfg.schema}.contracts_chunks
+WHERE source_path = 'dbfs:/Volumes/fabio_goncalves/contract_agent/contracts_ptbr/DEMO_Anexo_Precos_Condições_PagServ.pdf'
+ORDER BY page, chunk_id
+"""
+
+df_chunks = spark.sql(query)
+display(df_chunks)
 
 # COMMAND ----------
 

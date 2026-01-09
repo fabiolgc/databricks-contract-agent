@@ -10,8 +10,8 @@
 
 # COMMAND ----------
 
-#%pip install pyyaml
-#%restart_python
+# MAGIC %pip install pyyaml
+# MAGIC %restart_python
 
 # COMMAND ----------
 

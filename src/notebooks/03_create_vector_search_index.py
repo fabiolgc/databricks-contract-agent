@@ -10,8 +10,8 @@
 
 # COMMAND ----------
 
-#%pip install -q databricks-vectorsearch pyyaml
-#%restart_python
+# MAGIC %pip install -q databricks-vectorsearch pyyaml
+# MAGIC %restart_python
 
 # COMMAND ----------
 

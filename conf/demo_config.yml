@@ -12,4 +12,4 @@ vector_search_index: "{{catalog}}.{{schema}}.contracts_chunks_vs"
 
 # Model endpoints (ajuste para o que existir no workspace)
 chat_model_endpoint: databricks-meta-llama-3-1-70b-instruct
-embedding_model_endpoint: databricks-bge-large-en
+embedding_model_endpoint: databricks-bge-large-en 

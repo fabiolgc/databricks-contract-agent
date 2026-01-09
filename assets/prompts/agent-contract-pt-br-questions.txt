@@ -1,0 +1,71 @@
+Aplicáveis **direto aos PDFs PT-BR** do pacote (os 13 arquivos) são praticamente todas abaixo — eu já agrupei por tema e deixei as **3 “pegadinhas”** no final (que devem retornar “não encontrei nos documentos”).
+
+## Multa, rescisão e cancelamento
+
+* “Onde está a cláusula de **multa por rescisão antecipada**? Quanto é?”
+* “Se eu **cancelar antes do prazo**, quais valores podem ser cobrados?”
+* “Qual é o **aviso prévio** para cancelar o contrato?”
+* “Em caso de **rescisão por justa causa**, qual o prazo para corrigir o problema?”
+* “A multa pode ser **debitada em quanto tempo** após a rescisão?”
+* “Qual é a regra de **renovação automática** do contrato?”
+* “Em quanto tempo eu preciso **devolver os equipamentos** após cancelar?”
+* “Qual a **multa por não devolução** do equipamento?”
+
+## Descontos e volume mínimo
+
+* “Qual foi o **desconto aplicado** e por quanto tempo ele vale?”
+* “Em que condição eu **perco o desconto**?”
+* “Se eu rescindir antes do prazo, pode haver **cobrança proporcional do desconto**?”
+* “Qual é o **volume mínimo mensal** exigido para manter as condições?”
+
+## Prazos de liquidação e repasse
+
+* “Quais são os **prazos de liquidação** para débito e crédito à vista?”
+* “Como funciona o repasse no **crédito parcelado**?”
+* “Existe alguma situação em que pode haver **retenção de valores** no repasse?”
+
+## Garantia e equipamentos (comodato)
+
+* “Qual é a **garantia do equipamento** e o que não está coberto?”
+* “Se eu danificar o equipamento por mau uso, o que acontece?”
+* “Existe penalidade por **não devolução** e qual o prazo de devolução?”
+
+## Chargeback / contestação / evidências
+
+* “Qual é o **prazo** para eu responder uma contestação (chargeback)?”
+* “Quais **evidências** são aceitas para contestação?”
+* “Existe **tarifa por chargeback**? Qual o valor?”
+* “Em quais casos o prazo pode ser **reduzido** (urgência)?”
+* “A partir de qual taxa de chargeback podem ocorrer **retenções adicionais**?”
+
+## Conciliação e ajustes
+
+* “Qual é a **janela** para abrir divergência de conciliação?”
+* “Quando um **ajuste positivo** é creditado?”
+* “Quando um **ajuste negativo** é debitado?”
+* “Que evidências preciso para ajuste por **duplicidade**?”
+
+## SLA e suporte
+
+* “Qual o SLA de **resposta** para incidentes críticos (Sev 1)?”
+* “Qual o prazo de **correção** para Sev 2?”
+* “Existe alguma regra de **crédito** por indisponibilidade?”
+
+## “Onde fala…?” (ótimas para demo)
+
+* “Onde fala sobre **prazos** de cancelamento e devolução?”
+* “Onde fala sobre **penalidades** e auditoria?”
+* “Onde fala sobre **retenção** por risco de chargeback?”
+* “Onde fala sobre **desconto** e volume mínimo?”
+
+---
+
+## 3 perguntas NÃO aplicáveis (boas para mostrar anti-alucinação)
+
+Essas são ótimas para o agente responder corretamente: “**Não encontrei nos documentos disponíveis**”.
+
+* “Qual é a MDR de **Amex internacional**?”
+* “Qual a taxa para **PIX**?”
+* “Qual a multa específica para **migração para concorrente**?”
+
+Se você quiser, eu também posso te entregar uma **lista “pergunta → quais PDFs respondem melhor”** (por exemplo: multa e rescisão → contrato principal; desconto → aditivo/anexo; equipamento → termo de comodato; etc.), para você conduzir a demo com mais confiança.
