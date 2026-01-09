@@ -12,8 +12,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function ChatHeader() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { open } = useSidebar();
   const { chatHistoryEnabled } = useConfig();
@@ -33,7 +35,7 @@ export function ChatHeader() {
           }}
         >
           <PlusIcon />
-          <span className="md:sr-only">New Chat</span>
+          <span className="md:sr-only">{t.newChat}</span>
         </Button>
       )}
 
@@ -43,11 +45,11 @@ export function ChatHeader() {
             <TooltipTrigger asChild>
               <div className="ml-auto flex items-center gap-1.5 rounded-full bg-muted px-2 py-1 text-muted-foreground text-xs">
                 <CloudOffIcon className="h-3 w-3" />
-                <span className="hidden sm:inline">Ephemeral</span>
+                <span className="hidden sm:inline">{t.ephemeral}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Chat history disabled - conversations are not saved</p>
+              <p>{t.historyDisabled}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

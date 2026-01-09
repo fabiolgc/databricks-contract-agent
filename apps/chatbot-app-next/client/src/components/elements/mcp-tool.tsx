@@ -17,6 +17,7 @@ import {
   type ToolState,
 } from './tool';
 import type { McpApprovalState } from '@chat-template/ai-sdk-providers/mcp';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // MCP-specific container with distinct styling
 type McpToolProps = Parameters<typeof ToolContainer>[0];
@@ -46,6 +47,8 @@ type McpToolHeaderProps = {
 
 // Badge component for approval status in the banner
 const ApprovalStatusBadge = ({ status }: { status: McpApprovalState }) => {
+  const { t } = useLanguage();
+  
   if (status === 'awaiting-approval') {
     return (
       <span
@@ -53,7 +56,7 @@ const ApprovalStatusBadge = ({ status }: { status: McpApprovalState }) => {
         data-testid="mcp-approval-status-pending"
       >
         <ShieldAlertIcon className="size-3" />
-        <span>Pending</span>
+        <span>{t.pending}</span>
       </span>
     );
   }
@@ -64,7 +67,7 @@ const ApprovalStatusBadge = ({ status }: { status: McpApprovalState }) => {
         data-testid="mcp-approval-status-allowed"
       >
         <ShieldCheckIcon className="size-3" />
-        <span>Allowed</span>
+        <span>{t.allowed}</span>
       </span>
     );
   }
@@ -74,7 +77,7 @@ const ApprovalStatusBadge = ({ status }: { status: McpApprovalState }) => {
       data-testid="mcp-approval-status-denied"
     >
       <ShieldXIcon className="size-3" />
-      <span>Denied</span>
+      <span>{t.denied}</span>
     </span>
   );
 };
@@ -85,41 +88,45 @@ export const McpToolHeader = ({
   toolName,
   state,
   approvalStatus = 'awaiting-approval',
-}: McpToolHeaderProps) => (
-  <div className="border-border border-b bg-muted/50">
-    {/* MCP Banner */}
-    <div className="flex items-center gap-2 border-border border-b px-3 py-1.5 text-xs">
-      <ServerIcon className="size-3 text-muted-foreground" />
-      <span className="font-medium text-muted-foreground">
-        Tool Call Request
-      </span>
-      {serverName && (
-        <>
-          <span className="text-muted-foreground/50">•</span>
-          <span className="truncate text-muted-foreground">{serverName}</span>
-        </>
-      )}
-      <span className="text-muted-foreground/50">•</span>
-      <ApprovalStatusBadge status={approvalStatus} />
+}: McpToolHeaderProps) => {
+  const { t } = useLanguage();
+  
+  return (
+    <div className="border-border border-b bg-muted/50">
+      {/* MCP Banner */}
+      <div className="flex items-center gap-2 border-border border-b px-3 py-1.5 text-xs">
+        <ServerIcon className="size-3 text-muted-foreground" />
+        <span className="font-medium text-muted-foreground">
+          {t.toolCallRequest}
+        </span>
+        {serverName && (
+          <>
+            <span className="text-muted-foreground/50">•</span>
+            <span className="truncate text-muted-foreground">{serverName}</span>
+          </>
+        )}
+        <span className="text-muted-foreground/50">•</span>
+        <ApprovalStatusBadge status={approvalStatus} />
+      </div>
+      {/* Tool header */}
+      <CollapsibleTrigger
+        className={cn(
+          'flex w-full min-w-0 items-center justify-between gap-2 px-3 py-2',
+          className,
+        )}
+      >
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <span className="truncate font-mono text-sm">{toolName}</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {/* Only show tool status badge when approved (tool is actually running/completed) */}
+          {approvalStatus === 'approved' && <ToolStatusBadge state={state} />}
+          <ChevronDownIcon className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+        </div>
+      </CollapsibleTrigger>
     </div>
-    {/* Tool header */}
-    <CollapsibleTrigger
-      className={cn(
-        'flex w-full min-w-0 items-center justify-between gap-2 px-3 py-2',
-        className,
-      )}
-    >
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="truncate font-mono text-sm">{toolName}</span>
-      </div>
-      <div className="flex shrink-0 items-center gap-2">
-        {/* Only show tool status badge when approved (tool is actually running/completed) */}
-        {approvalStatus === 'approved' && <ToolStatusBadge state={state} />}
-        <ChevronDownIcon className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-      </div>
-    </CollapsibleTrigger>
-  </div>
-);
+  );
+};
 
 // MCP-specific approval actions
 type McpApprovalActionsProps = {
@@ -132,42 +139,46 @@ export const McpApprovalActions = ({
   onApprove,
   onDeny,
   isSubmitting,
-}: McpApprovalActionsProps) => (
-  <div
-    className="flex flex-col gap-3 border-amber-300 border-t bg-amber-50/50 p-3 dark:border-amber-700 dark:bg-amber-950/20"
-    data-testid="mcp-approval-actions"
-  >
-    <div className="flex items-start gap-2">
-      <ShieldAlertIcon className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
-      <p className="text-amber-800 text-sm dark:text-amber-200">
-        This tool requires your permission to run.
-      </p>
+}: McpApprovalActionsProps) => {
+  const { t } = useLanguage();
+  
+  return (
+    <div
+      className="flex flex-col gap-3 border-amber-300 border-t bg-amber-50/50 p-3 dark:border-amber-700 dark:bg-amber-950/20"
+      data-testid="mcp-approval-actions"
+    >
+      <div className="flex items-start gap-2">
+        <ShieldAlertIcon className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+        <p className="text-amber-800 text-sm dark:text-amber-200">
+          {t.toolPermissionRequired}
+        </p>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          variant="default"
+          size="sm"
+          onClick={onApprove}
+          disabled={isSubmitting}
+          className="bg-green-600 hover:bg-green-700"
+          data-testid="mcp-approval-allow"
+        >
+          <ShieldCheckIcon className="mr-1.5 size-4" />
+          {isSubmitting ? t.submitting : t.allow}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onDeny}
+          disabled={isSubmitting}
+          data-testid="mcp-approval-deny"
+        >
+          <ShieldXIcon className="mr-1.5 size-4" />
+          {t.deny}
+        </Button>
+      </div>
     </div>
-    <div className="flex gap-2">
-      <Button
-        variant="default"
-        size="sm"
-        onClick={onApprove}
-        disabled={isSubmitting}
-        className="bg-green-600 hover:bg-green-700"
-        data-testid="mcp-approval-allow"
-      >
-        <ShieldCheckIcon className="mr-1.5 size-4" />
-        {isSubmitting ? 'Submitting...' : 'Allow'}
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onDeny}
-        disabled={isSubmitting}
-        data-testid="mcp-approval-deny"
-      >
-        <ShieldXIcon className="mr-1.5 size-4" />
-        Deny
-      </Button>
-    </div>
-  </div>
-);
+  );
+};
 
 // MCP-specific approval status display
 type McpApprovalStatusProps = {
@@ -178,35 +189,39 @@ type McpApprovalStatusProps = {
 export const McpApprovalStatus = ({
   approved,
   reason,
-}: McpApprovalStatusProps) => (
-  <div
-    className={cn(
-      'flex items-center gap-2 border-t p-3',
-      approved
-        ? 'border-green-300 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20'
-        : 'border-red-300 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20',
-    )}
-  >
-    {approved ? (
-      <ShieldCheckIcon className="size-4 text-green-600 dark:text-green-400" />
-    ) : (
-      <ShieldXIcon className="size-4 text-red-600 dark:text-red-400" />
-    )}
-    <span
+}: McpApprovalStatusProps) => {
+  const { t } = useLanguage();
+  
+  return (
+    <div
       className={cn(
-        'text-sm',
+        'flex items-center gap-2 border-t p-3',
         approved
-          ? 'text-green-700 dark:text-green-300'
-          : 'text-red-700 dark:text-red-300',
+          ? 'border-green-300 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20'
+          : 'border-red-300 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20',
       )}
     >
-      {approved ? 'Allowed' : 'Denied'}
-    </span>
-    {reason && (
-      <>
-        <span className="text-muted-foreground/50">•</span>
-        <span className="text-muted-foreground text-sm">{reason}</span>
-      </>
-    )}
-  </div>
-);
+      {approved ? (
+        <ShieldCheckIcon className="size-4 text-green-600 dark:text-green-400" />
+      ) : (
+        <ShieldXIcon className="size-4 text-red-600 dark:text-red-400" />
+      )}
+      <span
+        className={cn(
+          'text-sm',
+          approved
+            ? 'text-green-700 dark:text-green-300'
+            : 'text-red-700 dark:text-red-300',
+        )}
+      >
+        {approved ? t.allowed : t.denied}
+      </span>
+      {reason && (
+        <>
+          <span className="text-muted-foreground/50">•</span>
+          <span className="text-muted-foreground text-sm">{reason}</span>
+        </>
+      )}
+    </div>
+  );
+};

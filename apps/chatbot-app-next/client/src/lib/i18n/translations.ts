@@ -5,6 +5,7 @@ export interface Translations {
   // Navigation and layout
   newChat: string;
   chatHistory: string;
+  toggleSidebar: string;
   
   // User menu
   toggleTheme: string;
@@ -24,6 +25,12 @@ export interface Translations {
   copied: string;
   edit: string;
   delete: string;
+  more: string;
+  share: string;
+  private: string;
+  public: string;
+  close: string;
+  navigationMenu: string;
   
   // History
   today: string;
@@ -75,12 +82,32 @@ export interface Translations {
   
   // Scroll
   scrollToBottom: string;
+  
+  // Suggested actions
+  suggestionHelp: string;
+  suggestionTellMe: string;
+  
+  // Reasoning
+  thinkingEllipsis: string;
+  thoughtFor: string;
+  thoughts: string;
+  
+  // MCP Tool Approval
+  pending: string;
+  allowed: string;
+  denied: string;
+  toolCallRequest: string;
+  toolPermissionRequired: string;
+  submitting: string;
+  allow: string;
+  deny: string;
 }
 
 export const translations: Record<Language, Translations> = {
   'en': {
     newChat: 'New Chat',
     chatHistory: 'Chat History',
+    toggleSidebar: 'Toggle Sidebar',
     
     toggleTheme: 'Toggle theme',
     darkMode: 'dark mode',
@@ -98,6 +125,12 @@ export const translations: Record<Language, Translations> = {
     copied: 'Copied!',
     edit: 'Edit',
     delete: 'Delete',
+    more: 'More',
+    share: 'Share',
+    private: 'Private',
+    public: 'Public',
+    close: 'Close',
+    navigationMenu: 'Navigation Menu',
     
     today: 'Today',
     yesterday: 'Yesterday',
@@ -140,11 +173,28 @@ export const translations: Record<Language, Translations> = {
     removeAttachment: 'Remove attachment',
     
     scrollToBottom: 'Scroll to bottom',
+    
+    suggestionHelp: 'How can you help me?',
+    suggestionTellMe: 'Tell me something I might not know',
+    
+    thinkingEllipsis: 'Thinking...',
+    thoughtFor: 'Thought for',
+    thoughts: 'Thoughts',
+    
+    pending: 'Pending',
+    allowed: 'Allowed',
+    denied: 'Denied',
+    toolCallRequest: 'Tool Call Request',
+    toolPermissionRequired: 'This tool requires your permission to run.',
+    submitting: 'Submitting...',
+    allow: 'Allow',
+    deny: 'Deny',
   },
   
   'pt-BR': {
     newChat: 'Novo Chat',
     chatHistory: 'Histórico de Chats',
+    toggleSidebar: 'Alternar Barra Lateral',
     
     toggleTheme: 'Alternar tema',
     darkMode: 'modo escuro',
@@ -162,6 +212,12 @@ export const translations: Record<Language, Translations> = {
     copied: 'Copiado!',
     edit: 'Editar',
     delete: 'Deletar',
+    more: 'Mais',
+    share: 'Compartilhar',
+    private: 'Privado',
+    public: 'Público',
+    close: 'Fechar',
+    navigationMenu: 'Menu de Navegação',
     
     today: 'Hoje',
     yesterday: 'Ontem',
@@ -204,11 +260,28 @@ export const translations: Record<Language, Translations> = {
     removeAttachment: 'Remover anexo',
     
     scrollToBottom: 'Rolar para o fim',
+    
+    suggestionHelp: 'Como você pode me ajudar?',
+    suggestionTellMe: 'Me conte algo que eu possa não saber',
+    
+    thinkingEllipsis: 'Pensando...',
+    thoughtFor: 'Pensou por',
+    thoughts: 'Pensamentos',
+    
+    pending: 'Pendente',
+    allowed: 'Permitido',
+    denied: 'Negado',
+    toolCallRequest: 'Solicitação de Ferramenta',
+    toolPermissionRequired: 'Esta ferramenta requer sua permissão para executar.',
+    submitting: 'Enviando...',
+    allow: 'Permitir',
+    deny: 'Negar',
   },
   
   'es': {
     newChat: 'Nuevo Chat',
     chatHistory: 'Historial de Chats',
+    toggleSidebar: 'Alternar Barra Lateral',
     
     toggleTheme: 'Cambiar tema',
     darkMode: 'modo oscuro',
@@ -226,6 +299,12 @@ export const translations: Record<Language, Translations> = {
     copied: '¡Copiado!',
     edit: 'Editar',
     delete: 'Eliminar',
+    more: 'Más',
+    share: 'Compartir',
+    private: 'Privado',
+    public: 'Público',
+    close: 'Cerrar',
+    navigationMenu: 'Menú de Navegación',
     
     today: 'Hoy',
     yesterday: 'Ayer',
@@ -268,6 +347,22 @@ export const translations: Record<Language, Translations> = {
     removeAttachment: 'Eliminar adjunto',
     
     scrollToBottom: 'Desplazar al final',
+    
+    suggestionHelp: '¿Cómo puedes ayudarme?',
+    suggestionTellMe: 'Cuéntame algo que quizás no sepa',
+    
+    thinkingEllipsis: 'Pensando...',
+    thoughtFor: 'Pensó durante',
+    thoughts: 'Pensamientos',
+    
+    pending: 'Pendiente',
+    allowed: 'Permitido',
+    denied: 'Denegado',
+    toolCallRequest: 'Solicitud de Herramienta',
+    toolPermissionRequired: 'Esta herramienta requiere tu permiso para ejecutarse.',
+    submitting: 'Enviando...',
+    allow: 'Permitir',
+    deny: 'Denegar',
   },
 };
 

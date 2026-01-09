@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { TriangleAlert } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const MessageError = ({ error }: { error: string }) => {
+  const { t } = useLanguage();
   // Attempt to parse and format JSON error messages
   const formatError = (
     errorMessage: string,
@@ -32,7 +34,7 @@ export const MessageError = ({ error }: { error: string }) => {
         <div className="text-destructive">
           <TriangleAlert size={14} />
         </div>
-        <span className="font-medium text-destructive text-xs">Error</span>
+        <span className="font-medium text-destructive text-xs">{t.error}</span>
       </div>
       <div className="rounded-b-lg rounded-tr-lg border border-destructive/20">
         <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-md bg-muted p-2.5 font-mono text-foreground text-xs">

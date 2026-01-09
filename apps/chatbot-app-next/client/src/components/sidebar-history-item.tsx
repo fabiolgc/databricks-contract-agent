@@ -25,6 +25,7 @@ import {
   ShareIcon,
   TrashIcon,
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const PureChatItem = ({
   chat,
@@ -37,6 +38,7 @@ const PureChatItem = ({
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
 }) => {
+  const { t } = useLanguage();
   const { visibilityType, setVisibilityType } = useChatVisibility({
     chatId: chat.id,
     initialVisibilityType: chat.visibility,
@@ -58,7 +60,7 @@ const PureChatItem = ({
             showOnHover={!isActive}
           >
             <MoreHorizontalIcon />
-            <span className="sr-only">More</span>
+            <span className="sr-only">{t.more}</span>
           </SidebarMenuAction>
         </DropdownMenuTrigger>
 
@@ -66,7 +68,7 @@ const PureChatItem = ({
           <DropdownMenuSub>
             <DropdownMenuSubTrigger className="cursor-pointer">
               <ShareIcon />
-              <span>Share</span>
+              <span>{t.share}</span>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
@@ -78,7 +80,7 @@ const PureChatItem = ({
                 >
                   <div className="flex flex-row items-center gap-2">
                     <LockIcon size={12} />
-                    <span>Private</span>
+                    <span>{t.private}</span>
                   </div>
                   {visibilityType === 'private' ? <CircleCheck /> : null}
                 </DropdownMenuItem>
@@ -90,7 +92,7 @@ const PureChatItem = ({
                 >
                   <div className="flex flex-row items-center gap-2">
                     <GlobeIcon />
-                    <span>Public</span>
+                    <span>{t.public}</span>
                   </div>
                   {visibilityType === 'public' ? <CircleCheck /> : null}
                 </DropdownMenuItem>
@@ -103,7 +105,7 @@ const PureChatItem = ({
             onSelect={() => onDelete(chat.id)}
           >
             <TrashIcon />
-            <span>Delete</span>
+            <span>{t.delete}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

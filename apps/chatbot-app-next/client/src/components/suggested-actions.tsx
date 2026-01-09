@@ -6,6 +6,7 @@ import type { ChatMessage } from '@chat-template/core';
 import { Suggestion } from './elements/suggestion';
 import { softNavigateToChatId } from '@/lib/navigation';
 import { useAppConfig } from '@/contexts/AppConfigContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SuggestedActionsProps {
   chatId: string;
@@ -15,9 +16,10 @@ interface SuggestedActionsProps {
 
 function PureSuggestedActions({ chatId, sendMessage }: SuggestedActionsProps) {
   const { chatHistoryEnabled } = useAppConfig();
+  const { t } = useLanguage();
   const suggestedActions = [
-    'How can you help me?',
-    'Tell me something I might not know',
+    t.suggestionHelp,
+    t.suggestionTellMe,
   ];
 
   return (

@@ -8,6 +8,7 @@ import type { ChatMessage } from '@chat-template/core';
 import { useDataStream } from './data-stream-provider';
 import { Conversation, ConversationContent } from './elements/conversation';
 import { ArrowDownIcon } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MessagesProps {
   chatId: string;
@@ -32,6 +33,7 @@ function PureMessages({
   isReadonly,
   selectedModelId,
 }: MessagesProps) {
+  const { t } = useLanguage();
   const {
     containerRef: messagesContainerRef,
     endRef: messagesEndRef,
@@ -106,7 +108,7 @@ function PureMessages({
           className="-translate-x-1/2 absolute bottom-40 left-1/2 z-10 rounded-full border bg-background p-2 shadow-lg transition-colors hover:bg-muted"
           onClick={() => scrollToBottom('smooth')}
           type="button"
-          aria-label="Scroll to bottom"
+          aria-label={t.scrollToBottom}
         >
           <ArrowDownIcon className="size-4" />
         </button>
