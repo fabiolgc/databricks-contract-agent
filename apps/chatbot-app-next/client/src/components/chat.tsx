@@ -23,6 +23,7 @@ import { ChatTransport } from '../lib/ChatTransport';
 import type { ClientSession } from '@chat-template/auth';
 import { softNavigateToChatId } from '@/lib/navigation';
 import { useAppConfig } from '@/contexts/AppConfigContext';
+import { BrowserChatStorage } from '@/lib/browser-storage';
 
 export function Chat({
   id,
@@ -88,6 +89,8 @@ export function Chat({
   const didFetchHistoryOnNewChat = useRef(false);
   const fetchChatHistory = useCallback(() => {
     mutate(unstable_serialize(getChatHistoryPaginationKey));
+    // Also trigger a custom event to refresh browser history
+    window.dispatchEvent(new CustomEvent('browser-history-updated'));
   }, [mutate]);
 
   const {
@@ -245,6 +248,44 @@ export function Chat({
       softNavigateToChatId(id, chatHistoryEnabled);
     }
   }, [query, sendMessage, hasAppendedQuery, id, chatHistoryEnabled]);
+
+  // Save messages to browser storage
+  useEffect(() => {
+    if (messages.length > 0) {
+      // Generate a title from the first user message
+      const firstUserMessage = messages.find((m) => m.role === 'user');
+      const title = firstUserMessage?.parts
+        ?.find((p) => p.type === 'text')
+        ?.text?.substring(0, 50) || 'New Chat';
+
+      // Get existing chat or create new one
+      const existingChat = BrowserChatStorage.getChat(id);
+      
+      // Convert messages to browser storage format
+      const browserMessages = messages.map((msg) => ({
+        id: msg.id,
+        chatId: id,
+        role: msg.role as 'user' | 'assistant',
+        content: msg.parts
+          ?.filter((p) => p.type === 'text')
+          .map((p) => p.text)
+          .join('\n') || '',
+        timestamp: Date.now(),
+      }));
+
+      // Save to browser storage
+      BrowserChatStorage.saveChat({
+        id,
+        title: existingChat?.title || title,
+        createdAt: existingChat?.createdAt || Date.now(),
+        updatedAt: Date.now(),
+        messages: browserMessages,
+      });
+
+      // Trigger refresh of browser history
+      window.dispatchEvent(new CustomEvent('browser-history-updated'));
+    }
+  }, [messages, id]);
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
 

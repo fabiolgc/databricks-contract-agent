@@ -1,6 +1,6 @@
 import { isToday, isYesterday, subMonths, subWeeks } from 'date-fns';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type ClientUser = {
   email: string;
@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { useConfig } from '@/hooks/use-config';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { BrowserChatStorage, type BrowserChat } from '@/lib/browser-storage';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -114,6 +115,32 @@ export function SidebarHistory({ user }: { user?: ClientUser | null }) {
     fallbackData: [],
   });
 
+  // Browser storage state
+  const [browserChats, setBrowserChats] = useState<BrowserChat[]>([]);
+  const [isBrowserLoading, setIsBrowserLoading] = useState(true);
+
+  // Load browser storage chats
+  useEffect(() => {
+    const loadBrowserChats = () => {
+      const chats = BrowserChatStorage.getAllChats();
+      setBrowserChats(chats);
+      setIsBrowserLoading(false);
+    };
+
+    loadBrowserChats();
+
+    // Listen for updates to browser history
+    const handleBrowserHistoryUpdate = () => {
+      loadBrowserChats();
+    };
+
+    window.addEventListener('browser-history-updated', handleBrowserHistoryUpdate);
+
+    return () => {
+      window.removeEventListener('browser-history-updated', handleBrowserHistoryUpdate);
+    };
+  }, []);
+
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -127,41 +154,45 @@ export function SidebarHistory({ user }: { user?: ClientUser | null }) {
     : false;
 
   const handleDelete = async () => {
-    const deletePromise = fetch(`/api/chat/${deleteId}`, {
-      method: 'DELETE',
-    });
+    if (!deleteId) return;
 
-    // // Emit event immediately to disable the chat UI
-    // window.dispatchEvent(
-    //   new CustomEvent('chat-deleted', { detail: { chatId: deleteId } })
-    // );
+    // If chatHistoryEnabled, delete from server
+    if (chatHistoryEnabled) {
+      const deletePromise = fetch(`/api/chat/${deleteId}`, {
+        method: 'DELETE',
+      });
 
-    toast.promise(deletePromise, {
-      loading: t.deletingChat,
-      success: () => {
-        mutate((chatHistories) => {
-          if (chatHistories) {
-            return chatHistories.map((chatHistory) => ({
-              ...chatHistory,
-              chats: chatHistory.chats.filter((chat) => chat.id !== deleteId),
-            }));
-          }
-        });
+      toast.promise(deletePromise, {
+        loading: t.deletingChat,
+        success: () => {
+          mutate((chatHistories) => {
+            if (chatHistories) {
+              return chatHistories.map((chatHistory) => ({
+                ...chatHistory,
+                chats: chatHistory.chats.filter((chat) => chat.id !== deleteId),
+              }));
+            }
+          });
 
-        return t.chatDeleted;
-      },
-      error: t.failedToDelete,
-    });
+          return t.chatDeleted;
+        },
+        error: t.failedToDelete,
+      });
+    } else {
+      // Delete from browser storage
+      try {
+        BrowserChatStorage.deleteChat(deleteId);
+        setBrowserChats(BrowserChatStorage.getAllChats());
+        toast.success(t.chatDeleted);
+      } catch (error) {
+        toast.error(t.failedToDelete);
+      }
+    }
 
     setShowDeleteDialog(false);
 
-    // Test if window.location.pathname is /chat/${id}
-    // This will be true for new chats that were just created
-    if (window.location.pathname === `/chat/${deleteId}`) {
-      navigate('/');
-    }
-
-    if (deleteId === id) {
+    // Navigate away if we're viewing the deleted chat
+    if (window.location.pathname === `/chat/${deleteId}` || deleteId === id) {
       navigate('/');
     }
   };
@@ -178,7 +209,9 @@ export function SidebarHistory({ user }: { user?: ClientUser | null }) {
     );
   }
 
-  if (isLoading) {
+  // Show loading state
+  const isLoadingAny = chatHistoryEnabled ? isLoading : isBrowserLoading;
+  if (isLoadingAny) {
     return (
       <SidebarGroup>
         <div className="px-2 py-1 text-sidebar-foreground/50 text-xs">
@@ -207,30 +240,46 @@ export function SidebarHistory({ user }: { user?: ClientUser | null }) {
     );
   }
 
-  if (hasEmptyChatHistory) {
+  // Check if empty
+  const isEmpty = chatHistoryEnabled 
+    ? hasEmptyChatHistory 
+    : browserChats.length === 0;
+
+  if (isEmpty) {
     return (
       <SidebarGroup>
         <SidebarGroupContent>
           <div className="flex w-full flex-row items-center justify-center gap-2 px-2 text-sm text-zinc-500">
-            {chatHistoryEnabled ? t.noHistory : t.historyDisabled}
+            {t.noHistory}
           </div>
         </SidebarGroupContent>
       </SidebarGroup>
     );
   }
 
+  // Convert browser chats to Chat format for rendering
+  const convertBrowserChatToChat = (browserChat: BrowserChat): Chat => ({
+    id: browserChat.id,
+    title: browserChat.title,
+    createdAt: new Date(browserChat.createdAt).toISOString(),
+    userId: 'local-user',
+    visibility: 'private' as const,
+  });
+
   return (
     <>
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
-            {paginatedChatHistories &&
-              (() => {
-                const chatsFromHistory = paginatedChatHistories.flatMap(
-                  (paginatedChatHistory) => paginatedChatHistory.chats,
-                );
+            {(() => {
+              // Use browser chats if no database, otherwise use server chats
+              const chatsFromHistory = chatHistoryEnabled
+                ? paginatedChatHistories?.flatMap(
+                    (paginatedChatHistory) => paginatedChatHistory.chats,
+                  ) || []
+                : browserChats.map(convertBrowserChatToChat);
 
-                const groupedChats = groupChatsByDate(chatsFromHistory);
+              const groupedChats = groupChatsByDate(chatsFromHistory);
 
                 return (
                   <div className="flex flex-col gap-6">
@@ -338,25 +387,30 @@ export function SidebarHistory({ user }: { user?: ClientUser | null }) {
               })()}
           </SidebarMenu>
 
-          <motion.div
-            onViewportEnter={() => {
-              if (!isValidating && !hasReachedEnd) {
-                setSize((size) => size + 1);
-              }
-            }}
-          />
+          {/* Only show pagination controls for server-based history */}
+          {chatHistoryEnabled && (
+            <>
+              <motion.div
+                onViewportEnter={() => {
+                  if (!isValidating && !hasReachedEnd) {
+                    setSize((size) => size + 1);
+                  }
+                }}
+              />
 
-          {hasReachedEnd ? (
-            <div className="mt-8 flex w-full flex-row items-center justify-center gap-2 px-2 text-sm text-zinc-500">
-              {t.endOfHistory}
-            </div>
-          ) : (
-            <div className="mt-8 flex flex-row items-center gap-2 p-2 text-zinc-500 dark:text-zinc-400">
-              <div className="animate-spin">
-                <LoaderIcon />
-              </div>
-              <div>{t.loadingChats}</div>
-            </div>
+              {hasReachedEnd ? (
+                <div className="mt-8 flex w-full flex-row items-center justify-center gap-2 px-2 text-sm text-zinc-500">
+                  {t.endOfHistory}
+                </div>
+              ) : (
+                <div className="mt-8 flex flex-row items-center gap-2 p-2 text-zinc-500 dark:text-zinc-400">
+                  <div className="animate-spin">
+                    <LoaderIcon />
+                  </div>
+                  <div>{t.loadingChats}</div>
+                </div>
+              )}
+            </>
           )}
         </SidebarGroupContent>
       </SidebarGroup>

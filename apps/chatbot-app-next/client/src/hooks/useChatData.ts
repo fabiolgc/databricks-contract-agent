@@ -2,6 +2,7 @@ import useSWR from 'swr';
 import type { Chat } from '@chat-template/db';
 import type { ChatMessage } from '@chat-template/core';
 import { convertToUIMessages } from '@/lib/utils';
+import { BrowserChatStorage } from '@/lib/browser-storage';
 
 interface ChatData {
   chat: Chat;
@@ -14,44 +15,90 @@ interface ChatData {
  */
 async function fetchChatData(url: string): Promise<ChatData | null> {
   const chatId = url.split('/').pop();
+  if (!chatId) return null;
 
-  // Fetch chat details
-  const chatResponse = await fetch(`/api/chat/${chatId}`, {
-    credentials: 'include',
-  });
+  try {
+    // Try to fetch from server first
+    const chatResponse = await fetch(`/api/chat/${chatId}`, {
+      credentials: 'include',
+    });
 
-  if (!chatResponse.ok) {
-    if (chatResponse.status === 404 || chatResponse.status === 403) {
-      return null;
+    if (chatResponse.ok) {
+      const chat = await chatResponse.json();
+
+      // Fetch messages
+      const messagesResponse = await fetch(`/api/messages/${chatId}`, {
+        credentials: 'include',
+      });
+
+      if (messagesResponse.ok) {
+        const messagesFromDb = await messagesResponse.json();
+        const messages = convertToUIMessages(messagesFromDb);
+
+        return {
+          chat,
+          messages,
+        };
+      }
     }
-    throw new Error('Failed to load chat');
-  }
 
-  const chat = await chatResponse.json();
+    // If server fetch fails, try localStorage
+    const browserChat = BrowserChatStorage.getChat(chatId);
+    if (browserChat) {
+      // Convert browser storage format to expected format
+      const chat: Chat = {
+        id: browserChat.id,
+        title: browserChat.title,
+        createdAt: new Date(browserChat.createdAt).toISOString(),
+        userId: 'local-user',
+        visibility: 'private' as const,
+      };
 
-  // Fetch messages
-  const messagesResponse = await fetch(`/api/messages/${chatId}`, {
-    credentials: 'include',
-  });
+      const messages: ChatMessage[] = browserChat.messages.map((msg) => ({
+        id: msg.id,
+        chatId: msg.chatId,
+        role: msg.role,
+        parts: [{ type: 'text' as const, text: msg.content }],
+        createdAt: new Date(msg.timestamp).toISOString(),
+      }));
 
-  if (!messagesResponse.ok) {
-    // If messages endpoint returns 404 (e.g., database disabled), return empty messages
-    if (messagesResponse.status === 404) {
       return {
         chat,
-        messages: [],
+        messages,
       };
     }
-    throw new Error('Failed to load messages');
+
+    return null;
+  } catch (error) {
+    console.error('Error fetching chat data:', error);
+    
+    // Fallback to localStorage on error
+    const browserChat = BrowserChatStorage.getChat(chatId);
+    if (browserChat) {
+      const chat: Chat = {
+        id: browserChat.id,
+        title: browserChat.title,
+        createdAt: new Date(browserChat.createdAt).toISOString(),
+        userId: 'local-user',
+        visibility: 'private' as const,
+      };
+
+      const messages: ChatMessage[] = browserChat.messages.map((msg) => ({
+        id: msg.id,
+        chatId: msg.chatId,
+        role: msg.role,
+        parts: [{ type: 'text' as const, text: msg.content }],
+        createdAt: new Date(msg.timestamp).toISOString(),
+      }));
+
+      return {
+        chat,
+        messages,
+      };
+    }
+
+    return null;
   }
-
-  const messagesFromDb = await messagesResponse.json();
-  const messages = convertToUIMessages(messagesFromDb);
-
-  return {
-    chat,
-    messages,
-  };
 }
 
 /**
