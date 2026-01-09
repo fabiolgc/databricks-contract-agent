@@ -1,4 +1,4 @@
-# Databricks Contract Agent Demo (Cielo)
+# Databricks Contract Agent Demo
 
 Demo para **pesquisa semântica em contratos/manuais (PT-BR)** usando:
 - Unity Catalog Volumes (armazenamento de PDFs)
