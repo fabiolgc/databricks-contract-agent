@@ -244,7 +244,7 @@ const PurePreviewMessage = ({
               // Render MCP tool calls with special styling
               if (isMcpApproval) {
                 return (
-                  <McpTool key={toolCallId} defaultOpen={true}>
+                  <McpTool key={toolCallId} defaultOpen={false}>
                     <McpToolHeader
                       serverName={mcpServerName}
                       toolName={toolName || 'mcp-tool'}
@@ -298,7 +298,7 @@ const PurePreviewMessage = ({
 
               // Render regular tool calls
               return (
-                <Tool key={toolCallId} defaultOpen={true}>
+                <Tool key={toolCallId} defaultOpen={false}>
                   <ToolHeader
                     type={toolName || 'tool-call'}
                     state={effectiveState}
